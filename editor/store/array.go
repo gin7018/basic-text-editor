@@ -1,65 +1,89 @@
 package store
 
-type Array struct {
-	cursor [2]int
-	store  [][]string
+type ArrayStore struct {
+	Cursor []int
+	Store  [][]string
 }
 
-var array_text_editor Array
+type EditorActions interface {
+	insert(text string)
+	delete(row int, col int)
+	up(row int, col int)
+	down(row int, col int)
+	left(row int, col int)
+	right(row int, col int)
+}
 
 const DIM_COL int = 400
 
-func insert(row int, col int, text string) {
-	if col == DIM_COL {
+func (editor *ArrayStore) Insert(text string, new_line bool) {
+	var row, col = editor.Cursor[0], editor.Cursor[1]
+	if col == DIM_COL || new_line {
 		//	add a new row since were at the end of the line
-		var new_row = []string{""}
-		array_text_editor.store = append(array_text_editor.store, new_row)
+		var new_row = []string{text}
+		//fmt.Printf(" address of store before adding row %p", &editor.Store)
+
+		editor.Store = append(editor.Store, new_row)
+
+		//fmt.Printf("after %p ", &editor.Store)
 
 		row += 1
 		col = 0
+	} else {
+		editor.Store[row] = append(editor.Store[row], text)
+		col += 1
 	}
-	array_text_editor.store[row][col] = text
 
+	editor.Cursor[0] = row
+	editor.Cursor[1] = col
 }
 
-func delete(row int, col int) {
-	var temp = array_text_editor.store[row]
-	array_text_editor.store[row] = append(temp[:col], temp[col+1:]...)
+func (editor *ArrayStore) Delete() {
+	var row, col = editor.Cursor[0], editor.Cursor[1]
+	var temp = editor.Store[row]
+	editor.Store[row] = append(temp[:col], temp[col+1:]...)
 
-	if len(array_text_editor.store[row]) == 0 {
-		array_text_editor.store = append(array_text_editor.store[:row])
-	}
+	//if len(editor.Store[row]) == 0 {
+	//	editor.Store = append(editor.Store[:row])
+	//
+	//} // todo revisit this logic
+
+	editor.Cursor[0] = row
+	editor.Cursor[1] = col - 1
 }
 
-func up(row int) {
+func (editor *ArrayStore) Up() {
+	var row = editor.Cursor[0]
 	if row == 0 {
 		return
 	}
-	var row_above_size = len(array_text_editor.store[row-1])
-	var current_row_size = len(array_text_editor.store[row])
+	var row_above_size = len(editor.Store[row-1])
+	var current_row_size = len(editor.Store[row])
 	if current_row_size > row_above_size {
-		array_text_editor.cursor = [2]int{row - 1, row_above_size - 1}
+		editor.Cursor = []int{row - 1, row_above_size - 1}
 	} else {
-		array_text_editor.cursor[0] = row - 1
+		editor.Cursor[0] = row - 1
 	}
 }
 
-func down(row int) {
-	var current_editor_size = len(array_text_editor.store)
+func (editor *ArrayStore) Down() {
+	var row = editor.Cursor[0]
+	var current_editor_size = len(editor.Store)
 	if row == current_editor_size {
 		return
 	}
-	var row_below_size = len(array_text_editor.store[row+1])
-	var current_row_size = len(array_text_editor.store[row])
+	var row_below_size = len(editor.Store[row+1])
+	var current_row_size = len(editor.Store[row])
 	if current_row_size > row_below_size {
-		array_text_editor.cursor = [2]int{row + 1, row_below_size - 1}
+		editor.Cursor = []int{row + 1, row_below_size - 1}
 	} else {
-		array_text_editor.cursor[0] = row + 1
+		editor.Cursor[0] = row + 1
 	}
 }
 
 // todo just wrapping if you reach the end
-func left(row int, col int) {
+func (editor *ArrayStore) Left() {
+	var row, col = editor.Cursor[0], editor.Cursor[1]
 	// two special case; first column
 	if row == 0 && col == 0 {
 		return
@@ -68,18 +92,19 @@ func left(row int, col int) {
 	// wrap effect (wrap up)
 	if col == 0 {
 		row -= 1
-		col = len(array_text_editor.store[row]) - 1
-		array_text_editor.cursor = [2]int{row, col}
+		col = len(editor.Store[row]) - 1
+		editor.Cursor = []int{row, col}
 	} else {
-		array_text_editor.cursor[1] -= 1
+		editor.Cursor[1] -= 1
 	}
 
 }
 
-func right(row int, col int) {
+func (editor *ArrayStore) Right() {
+	var row, col = editor.Cursor[0], editor.Cursor[1]
 	// similar special case as left cmd
-	var current_editor_size = len(array_text_editor.store)
-	var last_line_width = len(array_text_editor.store[current_editor_size-1])
+	var current_editor_size = len(editor.Store)
+	var last_line_width = len(editor.Store[current_editor_size-1])
 	if row == current_editor_size && col == last_line_width {
 		return
 	}
@@ -88,11 +113,11 @@ func right(row int, col int) {
 	if col == DIM_COL-1 {
 		col = 0
 		row += 1
-		array_text_editor.cursor = [2]int{row, col}
+		editor.Cursor = []int{row, col}
 	} else {
-		array_text_editor.cursor[1] += 1
+		editor.Cursor[1] += 1
 	}
 }
 
-// todo undo/redo commands. store each action as an event
+// todo undo/redo commands. Store each action as an event
 // in chronological order (linked list) event (action : insert/delete, text, location)
