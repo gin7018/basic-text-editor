@@ -60,7 +60,7 @@ func (editor *ArrayStore) Up() {
 	var row_above_size = len(editor.Store[row-1])
 	var current_row_size = len(editor.Store[row])
 	if current_row_size > row_above_size {
-		editor.Cursor = []int{row - 1, row_above_size - 1}
+		editor.Cursor[0], editor.Cursor[1] = row-1, row_above_size-1
 	} else {
 		editor.Cursor[0] = row - 1
 	}
@@ -75,7 +75,7 @@ func (editor *ArrayStore) Down() {
 	var row_below_size = len(editor.Store[row+1])
 	var current_row_size = len(editor.Store[row])
 	if current_row_size > row_below_size {
-		editor.Cursor = []int{row + 1, row_below_size - 1}
+		editor.Cursor[0], editor.Cursor[1] = row+1, row_below_size-1
 	} else {
 		editor.Cursor[0] = row + 1
 	}
@@ -93,7 +93,7 @@ func (editor *ArrayStore) Left() {
 	if col == 0 {
 		row -= 1
 		col = len(editor.Store[row]) - 1
-		editor.Cursor = []int{row, col}
+		editor.Cursor[0], editor.Cursor[1] = row, col
 	} else {
 		editor.Cursor[1] -= 1
 	}
@@ -113,7 +113,7 @@ func (editor *ArrayStore) Right() {
 	if col == DIM_COL-1 {
 		col = 0
 		row += 1
-		editor.Cursor = []int{row, col}
+		editor.Cursor[0], editor.Cursor[1] = row, col
 	} else {
 		editor.Cursor[1] += 1
 	}
