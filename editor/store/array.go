@@ -5,7 +5,7 @@ type ArrayStore struct {
 	Store  [][]string
 }
 
-const DIM_COL int = 400
+const DIM_COL int = 10
 
 func (editor *ArrayStore) Insert(text string, new_line bool) {
 	var row, col = editor.Cursor[0], editor.Cursor[1]
@@ -47,7 +47,6 @@ func (editor *ArrayStore) Delete() {
 		editor.Store = append(editor.Store[:row], editor.Store[row+1:]...)
 		editor.Cursor[0] = row - 1
 		editor.Cursor[1] = len(editor.Store[row-1]) - 1
-		// todo revisit this logic
 	} else {
 		editor.Cursor[0] = row
 		editor.Cursor[1] = col - 1
