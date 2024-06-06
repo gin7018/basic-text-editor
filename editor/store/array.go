@@ -1,14 +1,24 @@
 package store
 
 type ArrayStore struct {
-	Cursor []int
+	Cursor []int // todo cursor memory (tries to go stick to column as much as possible)
 	Store  [][]string
 }
 
 const DIM_COL int = 10
 
+type Event struct {
+	Cursor []int
+	Store  [][]string
+}
+
+var Editor_History []ArrayStore
+
 func (editor *ArrayStore) Insert(text string, new_line bool) {
 	var row, col = editor.Cursor[0], editor.Cursor[1]
+	event := *editor
+	Editor_History = append(Editor_History, event)
+
 	if col == DIM_COL || new_line {
 		//	add a new row since were at the end of the line
 		var new_row = []string{text}
@@ -37,6 +47,10 @@ func (editor *ArrayStore) Insert(text string, new_line bool) {
 func (editor *ArrayStore) Delete() {
 	// todo when you delete a row, delete things BEFORE cursor; preserve things AFTER cursor to the line above
 	var row, col = editor.Cursor[0], editor.Cursor[1]
+
+	event := *editor
+	Editor_History = append(Editor_History, event)
+
 	if row == 0 && col == 0 {
 		return
 	}
@@ -82,7 +96,6 @@ func (editor *ArrayStore) Down() {
 	}
 }
 
-// todo just wrapping if you reach the end
 func (editor *ArrayStore) Left() {
 	var row, col = editor.Cursor[0], editor.Cursor[1]
 	// two special case; first column
@@ -120,5 +133,16 @@ func (editor *ArrayStore) Right() {
 	}
 }
 
-// todo undo/redo commands. Store each action as an event
+// Undo todo undo/redo commands. Store each action as an event
 // in chronological order (linked list) event (action : insert/delete, text, location)
+func (editor *ArrayStore) Undo() {
+	if len(Editor_History) == 0 {
+		return
+	}
+
+	var last_event = Editor_History[len(Editor_History)-1]
+
+	editor.Store = append(last_event.Store)
+	editor.Cursor[0], editor.Cursor[1] = last_event.Cursor[0], last_event.Cursor[1]
+	Editor_History = Editor_History[:len(Editor_History)-1]
+}

@@ -42,6 +42,9 @@ func main() {
 	fmt.Println("--------")
 	hide_builtin_cursor()
 
+	// todo UNDO command
+	// todo REDO command (can only redo DIRECTLY after undo command)
+
 	var editor = store.ArrayStore{Store: make([][]string, 1), Cursor: []int{0, 0}}
 	editor.Store[0] = make([]string, 1)
 
@@ -66,13 +69,15 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		//fmt.Println("typed ", char)
 		if key == keyboard.KeySpace {
 			editor.Insert(" ", false)
 		} else if key == keyboard.KeyBackspace {
-			editor.Delete() // not fully working when at end of line
+			editor.Delete()
 		} else if arrow_action := arrow_key_map[key]; arrow_action != nil {
 			arrow_action()
+		} else if key == keyboard.KeyCtrlZ {
+			fmt.Println("here in cz")
+			editor.Undo()
 		} else {
 			if key == keyboard.KeyEnter {
 				editor.Insert("", true)
