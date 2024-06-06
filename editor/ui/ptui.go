@@ -76,7 +76,6 @@ func main() {
 		} else if arrow_action := arrow_key_map[key]; arrow_action != nil {
 			arrow_action()
 		} else if key == keyboard.KeyCtrlZ {
-			fmt.Println("here in cz")
 			editor.Undo()
 		} else {
 			if key == keyboard.KeyEnter {

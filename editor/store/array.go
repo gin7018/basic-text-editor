@@ -12,11 +12,14 @@ type Event struct {
 	Store  [][]string
 }
 
-var Editor_History []ArrayStore
+var Editor_History []Event
 
 func (editor *ArrayStore) Insert(text string, new_line bool) {
 	var row, col = editor.Cursor[0], editor.Cursor[1]
-	event := *editor
+
+	event := Event{Cursor: make([]int, 0), Store: make([][]string, 0)}
+	event.Cursor = append(event.Cursor, editor.Cursor...)
+	event.Store = append(event.Store, editor.Store...)
 	Editor_History = append(Editor_History, event)
 
 	if col == DIM_COL || new_line {
@@ -48,7 +51,9 @@ func (editor *ArrayStore) Delete() {
 	// todo when you delete a row, delete things BEFORE cursor; preserve things AFTER cursor to the line above
 	var row, col = editor.Cursor[0], editor.Cursor[1]
 
-	event := *editor
+	event := Event{Cursor: make([]int, 0), Store: make([][]string, 0)}
+	event.Cursor = append(event.Cursor, editor.Cursor...)
+	event.Store = append(event.Store, editor.Store...)
 	Editor_History = append(Editor_History, event)
 
 	if row == 0 && col == 0 {
@@ -133,8 +138,7 @@ func (editor *ArrayStore) Right() {
 	}
 }
 
-// Undo todo undo/redo commands. Store each action as an event
-// in chronological order (linked list) event (action : insert/delete, text, location)
+// Undo stores each action as an event in an array
 func (editor *ArrayStore) Undo() {
 	if len(Editor_History) == 0 {
 		return
