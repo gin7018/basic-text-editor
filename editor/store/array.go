@@ -5,15 +5,6 @@ type ArrayStore struct {
 	Store  [][]string
 }
 
-type EditorActions interface {
-	insert(text string)
-	delete(row int, col int)
-	up(row int, col int)
-	down(row int, col int)
-	left(row int, col int)
-	right(row int, col int)
-}
-
 const DIM_COL int = 400
 
 func (editor *ArrayStore) Insert(text string, new_line bool) {
