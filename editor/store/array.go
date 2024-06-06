@@ -24,13 +24,18 @@ func (editor *ArrayStore) Insert(text string, new_line bool) {
 		//fmt.Printf(" address of store before adding row %p", &editor.Store)
 
 		editor.Store = append(editor.Store, new_row)
-
+		// todo if enter pressed and cursor is mid sentence, move rest of sentence to new line
 		//fmt.Printf("after %p ", &editor.Store)
 
 		row += 1
 		col = 0
 	} else {
-		editor.Store[row] = append(editor.Store[row], text)
+		if col == len(editor.Store[row])-1 {
+			editor.Store[row] = append(editor.Store[row], text)
+		} else {
+			editor.Store[row] = append(editor.Store[row][:col+1], editor.Store[row][col:]...)
+			editor.Store[row][col+1] = text
+		}
 		col += 1
 	}
 
@@ -95,7 +100,7 @@ func (editor *ArrayStore) Left() {
 		col = len(editor.Store[row]) - 1
 		editor.Cursor[0], editor.Cursor[1] = row, col
 	} else {
-		editor.Cursor[1] -= 1
+		editor.Cursor[1] = col - 1
 	}
 
 }
