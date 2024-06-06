@@ -23,7 +23,7 @@ func (editor *ArrayStore) Insert(text string, new_line bool) {
 		var new_row = []string{text}
 		//fmt.Printf(" address of store before adding row %p", &editor.Store)
 
-		editor.Store = append(editor.Store, new_row)
+		editor.Store = append(append(editor.Store[:row+1], new_row), editor.Store[row+1:]...)
 		// todo if enter pressed and cursor is mid sentence, move rest of sentence to new line
 		//fmt.Printf("after %p ", &editor.Store)
 
@@ -44,17 +44,23 @@ func (editor *ArrayStore) Insert(text string, new_line bool) {
 }
 
 func (editor *ArrayStore) Delete() {
+	// todo when you delete a row, delete things BEFORE cursor; preserve things AFTER cursor to the line above
 	var row, col = editor.Cursor[0], editor.Cursor[1]
+	if row == 0 && col == 0 {
+		return
+	}
 	var temp = editor.Store[row]
 	editor.Store[row] = append(temp[:col], temp[col+1:]...)
 
-	//if len(editor.Store[row]) == 0 {
-	//	editor.Store = append(editor.Store[:row])
-	//
-	//} // todo revisit this logic
-
-	editor.Cursor[0] = row
-	editor.Cursor[1] = col - 1
+	if col == 0 {
+		editor.Store = append(editor.Store[:row], editor.Store[row+1:]...)
+		editor.Cursor[0] = row - 1
+		editor.Cursor[1] = len(editor.Store[row-1]) - 1
+		// todo revisit this logic
+	} else {
+		editor.Cursor[0] = row
+		editor.Cursor[1] = col - 1
+	}
 }
 
 func (editor *ArrayStore) Up() {
@@ -74,7 +80,7 @@ func (editor *ArrayStore) Up() {
 func (editor *ArrayStore) Down() {
 	var row = editor.Cursor[0]
 	var current_editor_size = len(editor.Store)
-	if row == current_editor_size {
+	if row == current_editor_size-1 {
 		return
 	}
 	var row_below_size = len(editor.Store[row+1])
