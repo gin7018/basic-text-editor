@@ -42,7 +42,6 @@ func main() {
 	fmt.Println("--------")
 	hide_builtin_cursor()
 
-	// todo UNDO command
 	// todo REDO command (can only redo DIRECTLY after undo command)
 
 	var editor = store.ArrayStore{Store: make([][]string, 1), Cursor: []int{0, 0}}

@@ -25,11 +25,8 @@ func (editor *ArrayStore) Insert(text string, new_line bool) {
 	if col == DIM_COL || new_line {
 		//	add a new row since were at the end of the line
 		var new_row = []string{text}
-		//fmt.Printf(" address of store before adding row %p", &editor.Store)
-
 		editor.Store = append(append(editor.Store[:row+1], new_row), editor.Store[row+1:]...)
 		// todo if enter pressed and cursor is mid sentence, move rest of sentence to new line
-		//fmt.Printf("after %p ", &editor.Store)
 
 		row += 1
 		col = 0
