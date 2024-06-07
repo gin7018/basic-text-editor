@@ -5,7 +5,7 @@ type ArrayStore struct {
 	Store  [][]string
 }
 
-const DIM_COL int = 10
+const DIM_COL int = 100
 
 type Event struct {
 	Cursor []int
