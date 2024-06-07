@@ -2,7 +2,8 @@
 text editor with basic functionality
 
 ## \>> demo <<
-<video width="320" autoplay src="demo.mp4"></video>
+<video src="https://github.com/gin7018/basic-text-editor/assets/79063763/a7fadeef-8a48-49fa-9ead-a98712b348dd" autoplay loop></video>
+
 
 
 ### Future TODOs
